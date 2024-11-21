@@ -1,0 +1,8 @@
+# Logfile created on 2024-11-21 01:11:47 +0200 by logger.rb/v1.6.1
+I, [2024-11-21T01:11:47.034482 #24430]  INFO -- : Processed: Started scraping books.
+E, [2024-11-21T01:11:47.034565 #24430] ERROR -- : Error: Failed to scrape product info.
+I, [2024-11-21T03:18:06.912928 #64762]  INFO -- : Processed: Started scraping books.
+I, [2024-11-21T03:18:06.913237 #64762]  INFO -- : Processed: Item initialized: Laptop, 1000
+I, [2024-11-21T03:18:08.459514 #64762]  INFO -- : Processed: Item initialized: Enormous Linen Shirt, 91.91
+I, [2024-11-21T03:18:08.459778 #64762]  INFO -- : Processed: Item initialized: Smartphone, 500
+I, [2024-11-21T03:18:08.459878 #64762]  INFO -- : Processed: Processed item: Gaming Laptop, 1500

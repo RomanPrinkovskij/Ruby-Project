@@ -1,0 +1,10 @@
+AllCops:
+  TargetRubyVersion: 3.2.2 # Replace with your Ruby version
+  NewCops: enable
+
+Layout/LineLength:
+  Max: 120
+
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*'
