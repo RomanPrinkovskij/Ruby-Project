@@ -2,7 +2,7 @@ module ItemContainer
   module ClassMethods
     # Метод для повернення інформації про клас (ім'я та версія)
     def class_info
-      "#{self.name} - Version 1.0"
+      "#{name} - Version 1.0"
     end
 
     # Лічильник кількості створених об'єктів
@@ -31,21 +31,21 @@ module ItemContainer
     # Видалення всіх товарів з колекції
     def delete_items
       @items.clear
-      LoggerManager.log_processed_file("All items deleted.")
+      LoggerManager.log_processed_file('All items deleted.')
     end
 
     # Псевдоним для методу show_all_items
     def method_missing(method, *args)
       if method == :show_all_items
-        @items.each { |item| puts item.to_s }
+        @items.each { |item| puts item }
       else
         super
       end
     end
 
     # Ітерація по всіх товарах
-    def each(&block)
-      @items.each(&block)
+    def each(&)
+      @items.each(&)
     end
   end
 

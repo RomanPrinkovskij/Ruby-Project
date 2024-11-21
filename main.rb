@@ -4,6 +4,7 @@ require_relative 'lib/LoggerManager'
 require_relative 'lib/Item'
 require_relative 'lib/Cart'
 require_relative 'lib/Configurator'
+require_relative 'lib/SimpleWebsiteParser'
 
 # Use the methods from SomeScript
 puts Dir.pwd
@@ -85,3 +86,13 @@ puts "Updated config: #{configurator.config}"
 
 # Виводимо список доступних методів конфігурації
 puts "Available methods: #{Configurator.available_methods}"
+
+# Тестування парсера
+puts 'Starting website scraping...'
+scraper = SimpleWebsiteParser.new('config/yaml_config/web_parser.yaml')
+scraper.start_parse
+puts 'Scraping completed.'
+
+# Перевіряємо результати парсингу
+puts "Scraped items: #{scraper.item_collection.size}"
+puts "First scraped item: #{scraper.item_collection.first[:name]}" if scraper.item_collection.any?
