@@ -2,6 +2,8 @@
 require_relative 'lib/AppConfigLoader'
 require_relative 'lib/LoggerManager'
 require_relative 'lib/Item'
+require_relative 'lib/Cart'
+require_relative 'lib/Configurator'
 
 # Use the methods from SomeScript
 puts Dir.pwd
@@ -47,3 +49,39 @@ puts "Is the first item more expensive than the second? #{item > item2}"
 
 # Логування обробки товару
 LoggerManager.log_processed_file("Processed item: #{item.name}, #{item.price}")
+
+# Створюємо Cart і додаємо тестові товари
+cart = Cart.new
+cart.generate_test_items(5)
+
+# Показуємо всі товари
+cart.show_all_items
+
+# Перевіряємо лічильник об'єктів
+puts "Object count: #{Cart.object_count}"
+
+# Видаляємо товар
+cart.remove_item(cart.items.first)
+
+# Видаляємо всі товари
+cart.delete_items
+
+# Створюємо новий екземпляр Configurator
+configurator = Configurator.new
+
+# Перевіряємо початкові конфігураційні параметри
+puts "Initial config: #{configurator.config}"
+
+# Налаштовуємо конфігураційні параметри
+configurator.configure(
+  run_website_parser: 1,      # Включити розбір сайту
+  run_save_to_csv: 1,         # Включити збереження даних в CSV
+  run_save_to_yaml: 1,       # Включити збереження даних в YAML
+  run_save_to_sqlite: 1      # Включити збереження даних в SQLite
+)
+
+# Перевіряємо налаштовані параметри
+puts "Updated config: #{configurator.config}"
+
+# Виводимо список доступних методів конфігурації
+puts "Available methods: #{Configurator.available_methods}"
