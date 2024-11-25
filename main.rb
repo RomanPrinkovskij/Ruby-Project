@@ -91,6 +91,7 @@ puts "Available methods: #{Configurator.available_methods}"
 puts 'Starting website scraping...'
 scraper = SimpleWebsiteParser.new('config/yaml_config/web_parser.yaml')
 scraper.start_parse
+scraper. save_all_data_to_csv
 puts 'Scraping completed.'
 
 # Перевіряємо результати парсингу

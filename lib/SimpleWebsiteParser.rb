@@ -2,7 +2,8 @@ require 'mechanize'
 require 'yaml'
 require 'logger'
 require 'fileutils'
-require 'thread'
+require 'json'
+require 'csv'
 
 class SimpleWebsiteParser
   attr_reader :config, :agent, :item_collection
@@ -48,13 +49,10 @@ class SimpleWebsiteParser
     @logger.info('Витягуємо посилання на продукти...')
     links = page.search(@config['product_links_selector']).map { |link| link['href'] }.uniq
 
-    # Перевірка, чи є лінк абсолютним, і комбінування з базовим URL
     links.map! do |link|
-      # Якщо посилання вже абсолютне
       if link.start_with?('http')
         link
       else
-        # Якщо це відносне посилання, комбінуємо з базовим URL
         URI.join(page.uri.to_s, link).to_s
       end
     end
@@ -70,6 +68,7 @@ class SimpleWebsiteParser
       threads << Thread.new { parse_product_page(link) }
     end
     threads.each(&:join)
+    save_all_data_to_csv # Save data to CSV after parsing is complete
   end
 
   def parse_product_page(product_link)
@@ -78,6 +77,7 @@ class SimpleWebsiteParser
       page = @agent.get(product_link)
       product = extract_product_details(page)
       @item_collection << product
+      save_product_to_json(product) # Save product details to JSON file
     else
       @logger.error("Продукт #{product_link} недоступний.")
     end
@@ -111,32 +111,40 @@ class SimpleWebsiteParser
       @logger.error('Не знайдено зображення для продукту.')
       return nil
     end
-    image_url = image_element['src']
-    save_product_image(image_url, product) if image_url
-    image_url
+    image_element['src']
   end
 
   def extract_product_category(product)
     product.search('.breadcrumb li:nth-child(3) a').text.strip
   rescue StandardError => e
     @logger.error("Не вдалося отримати категорію продукту: #{e.message}")
-    nil
+    'Default'
   end
 
-  def save_product_image(image_url, product_page)
-    # Extract the category dynamically from the product page
-    category = extract_product_category(product_page)
-
-    # If no category is found, default to a generic folder
-    category = 'uncategorized' if category.nil? || category.empty?
-
-    image_filename = File.basename(image_url)
-    dir_path = File.join('media_dir', category)
+  def save_product_to_json(product)
+    category = product[:category] || 'uncategorized'
+    dir_path = File.join('output', category)
 
     FileUtils.mkdir_p(dir_path) unless File.exist?(dir_path)
 
-    image_path = File.join(dir_path, image_filename)
-    File.binwrite(image_path, @agent.get(image_url).body)
-    @logger.info("Зображення збережено: #{image_path}")
+    json_filename = "#{product[:name].gsub(/[^0-9A-Za-z.\-]/, '_')}.json"
+    json_path = File.join(dir_path, json_filename)
+
+    File.write(json_path, product.to_json)
+    @logger.info("Дані продукту збережено у JSON файл: #{json_path}")
+  end
+
+  def save_all_data_to_csv
+    @logger.info('Зберігаємо всі дані у CSV файл...')
+    csv_path = 'output/products_data.csv'
+    headers = ['name', 'price', 'description', 'image_url', 'category']
+    
+    CSV.open(csv_path, 'wb', write_headers: true, headers: headers) do |csv|
+      @item_collection.each do |product|
+        csv << [product[:name], product[:price], product[:description], product[:image_url], product[:category]]
+      end
+    end
+
+    @logger.info("Дані збережено у CSV файл: #{csv_path}")
   end
 end
